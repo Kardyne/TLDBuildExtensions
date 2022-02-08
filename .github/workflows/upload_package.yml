@@ -1,0 +1,23 @@
+name: Upload NuGet package
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Restore dependencies
+      run: dotnet restore TLDBuildExtensions.sln
+    - name: Build
+      run: dotnet build TLDBuildExtensions.sln --no-restore --configuration Release
+    - name: Push to NuGet.org
+      run: dotnet nuget push bin/Release/Kardyne.TLDBuildExtensions.${{ github.ref_name }}.nupkg -s https://api.nuget.org/v3/index.json -k ${{ secrets.NUGET_API_KEY }}

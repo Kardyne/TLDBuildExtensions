@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2022 Kardyne. All rights reserved.
+Licensed under the MIT license. See LICENSE file in the project root for details.
+-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<PropertyGroup>
+		<SteamDir>$(registry:HKEY_CURRENT_USER\Software\Valve\Steam@SteamPath)</SteamDir>
+		<SteamDir Condition="!Exists('$(SteamDir)')">$(registry:HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Valve\Steam@InstallPath)</SteamDir>
+		<SteamDir>$([MSBuild]::EnsureTrailingSlash('$(SteamDir)'))</SteamDir>
+		<TLDSteamDir Condition="Exists('$(SteamDir)')">$(SteamDir)steamapps\common\TheLongDark</TLDSteamDir>
+	</PropertyGroup>
+</Project>

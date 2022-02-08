@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.Build.NoTargets/3.3.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Description>Provides targets and properties for The Long Dark mod projects.</Description>
+    <Version>1.0.0</Version>
+    <Authors>Kardyne</Authors>
+    <Copyright>© Kardyne. All rights reserved.</Copyright>
+    <PackageProjectUrl>https://github.com/Kardyne/TLDBuildExtensions</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Kardyne/TLDBuildExtensions.git</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="build\**" Pack="True" PackagePath="build\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".github\workflows\create_release.yml" />
+    <None Include=".github\workflows\upload_package.yml" />
+    <None Include=".gitignore" />
+    <None Include="CHANGELOG.md" />
+    <None Include="LICENSE" />
+    <None Include="README.md" />
+  </ItemGroup>
+</Project>

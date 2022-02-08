@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--
+Copyright (c) 2022 Kardyne. All rights reserved.
+Licensed under the MIT license. See LICENSE file in the project root for details.
+-->
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<!--Properties
+		These properties must be defined here as they need the $(ProjectDir) properties
+		which is not yet available when Directory.Build.props is evaluated.
+		Description:
+		  UnityProjectDir: Absolute path to the Unity project dir.
+		  ModComponentDir: Absolute path to the ModComponent files.
+		  ModComponentFilename: Filename (with extension) for the ModComponent name.
+		  ModComponentZip: Absolute path to the ModComponent zipped file.
+		  AutoMappedDir: Absolute path to the 'auto-mapped' dir for storing AssetBundle files.
+	-->
+	<PropertyGroup>
+		<UnityProjectDir Condition="'$(UnityProjectDir)' == ''">$(ProjectDir)$(UnityProjectRelativeDir)</UnityProjectDir>
+		<ModComponentDir Condition="'$(ModComponentDir=)' == ''">$(ProjectDir)$(ModComponentRelativeDir)</ModComponentDir>
+		<ModComponentFilename Condition="'$(ModComponentFilename)' == ''">$(TargetName).modcomponent</ModComponentFilename>
+		<ModComponentZip Condition="'$(ModComponentZip)' == ''">$(TargetDir)$(ModComponentFilename)</ModComponentZip>
+		<AutoMappedDir Condition="'$(AutoMappedDir)' == ''">$(ModComponentDir)auto-mapped\</AutoMappedDir>
+	</PropertyGroup>
+	<!--Asset Bundles Build-->
+	<Target Name="FindAssetBundleFiles"
+			Condition="Exists('$(UnityProjectDir)') And Exists('$(UnityProjectDir)AssetBundles\AssetBundles.manifest')">
+		<!--Read AssetBundles\AssetBundles.manifest file and filter it to retrieve AssetBundle names-->
+		<ReadLinesFromFile File="$(UnityProjectDir)AssetBundles\AssetBundles.manifest">
+			<Output TaskParameter="Lines" ItemName="ManifestLines" />
+		</ReadLinesFromFile>
+		<ItemGroup>
+			<FilteredLines Include="@(ManifestLines)" Condition="$([System.String]::Copy(%(Identity)).StartsWith('Name:'))" />
+			<AssetBundleNamesExt Include="@(FilteredLines -> TrimStart('Name: '))" />
+			<AssetBundleNames Include="@(AssetBundleNamesExt -> Replace('.unity3d', ''))" />
+			<AssetBundleFiles Include="@(AssetBundleNames -> '$(UnityProjectDir)AssetBundles\%(Identity).unity3d')" />
+		</ItemGroup>
+	</Target>
+	<Target Name="FindUnityAssetFiles"
+			Condition="Exists('$(UnityProjectDir)')">
+		<ItemGroup>
+			<UnityAssetFiles Include="$(UnityProjectDir)Assets\**\*.*"/>
+		</ItemGroup>
+	</Target>
+	<Target Name="BuildAssetBundles"
+			Condition="Exists('$(UnityProjectDir)')"
+			Inputs="@(UnityAssetFiles)"
+			Outputs="@(AssetBundleFiles)"
+			DependsOnTargets="FindAssetBundleFiles;FindUnityAssetFiles"
+			AfterTargets="Build">
+		<Message Importance="high" Text="Building Asset Bundles for Unity project at '$(UnityProjectDir)'" />
+		<Exec StandardOutputImportance="normal" Command="&quot;$(UnityEditorPath)&quot; -projectPath &quot;$(UnityProjectDir)&quot; -executeMethod &quot;BuildAssetBundles.ExportResource&quot; -batchmode -nographics -noUpm -silent-crashes -quit" />
+	</Target>
+	<!--Asset Bundles Copy-->
+	<Target Name="CopyAssetBundles"
+			Condition="Exists('$(UnityProjectDir)') And Exists('$(AutoMappedDir)')"
+			Inputs="@(AssetBundleFiles)"
+			Outputs="@(AssetBundleFiles->'$(AutoMappedDir)%(Filename)%(Extension)')"
+			AfterTargets="BuildAssetBundles"
+			DependsOnTargets="FindAssetBundleFiles">
+		<Message Importance="high" Text="Copying Asset Bundles to '$(AutoMappedDir)'" />
+		<Copy SourceFiles="@(AssetBundleFiles)" DestinationFolder="$(AutoMappedDir)" />
+	</Target>
+	<!--ModComponent zip-->
+	<Target Name="FindModComponentFiles"
+			Condition="Exists('$(ModComponentDir)')"
+			AfterTargets="CopyAssetBundles">
+		<ItemGroup>
+			<ModComponentFiles Include="$(ModComponentDir)**\*.*"/>
+		</ItemGroup>
+	</Target>
+	<Target Name="BuildModComponent"
+			Condition="Exists('$(ModComponentDir)')"
+			Inputs="@(ModComponentFiles)"
+			Outputs="$(ModComponentZip)"
+			DependsOnTargets="FindModComponentFiles"
+			AfterTargets="Build">
+		<Message Importance="high" Text="Zipping ModComponent files at '$(ModComponentDir)'" />
+		<ZipDirectory SourceDirectory="$(ModComponentDir)" DestinationFile="$(ModComponentZip)" Overwrite="true"/>
+	</Target>
+	<!--Copy to Mods Dir-->
+	<Target Name="CopyModComponent"
+			Condition="'$(Configuration)' == 'Debug'
+					   And Exists('$(TLDModsDir)')
+					   And Exists('$(ModComponentDir)')"
+			Inputs="$(ModComponentZip)"
+			Outputs="$(TLDModsDir)\$(ModComponentFilename)"
+			AfterTargets="BuildModComponent">
+		<Message Importance="high" Text="Copying ModComponent file at '$(ModComponentZip)' to '$(TLDModsDir)'" />
+		<Copy SourceFiles="$(ModComponentZip)" DestinationFolder="$(TLDModsDir)" />
+	</Target>
+	<Target Name="CopyDLL"
+			Condition="'$(Configuration)' == 'Debug' And Exists('$(TLDModsDir)') And Exists('$(TargetPath)')"
+			Inputs="$(TargetPath)"
+			Outputs="$(TLDModsDir)\$(TargetFileName)"
+			AfterTargets="Build">
+		<Message Importance="high" Text="Copying DLL at '$(TargetPath)' to '$(TLDModsDir)'" />
+		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(TLDModsDir)" />
+	</Target>
+</Project>

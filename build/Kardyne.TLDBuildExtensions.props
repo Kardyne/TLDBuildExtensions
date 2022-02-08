@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2022 Kardyne. All rights reserved.
+Licensed under the MIT license. See LICENSE file in the project root for details.
+-->
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<!--Default values-->
+	<PropertyGroup>
+		<UnityEditorPath Condition="'$(UnityEditorPath)' == ''">$(ProgramFiles)\Unity\Editor\Unity.exe</UnityEditorPath>
+		<UnityProjectRelativeDir Condition="'$(UnityProjectRelativeDir)' == ''">Unity\</UnityProjectRelativeDir>
+		<ModComponentRelativeDir Condition="'$(ModComponentRelativeDir)' == ''">Distributable\</ModComponentRelativeDir>
+	</PropertyGroup>
+	<!--(Try to) Autodetect TLD install
+		Chooses the Steam install over the Epic one if both are found.
+	-->
+	<Import Condition="Exists('Epic.props')" Project="Epic.props"/>
+	<Import Condition="Exists('Steam.props')" Project="Steam.props"/>
+	<PropertyGroup Condition="'$(TLDDir)' == ''">
+		<TLDDir Condition="Exists('$(TLDSteamDir)')">$(TLDSteamDir)</TLDDir>
+		<TLDSteam>false</TLDSteam>
+		<TLDSteam Condition="Exists('$(TLDSteamDir)')">true</TLDSteam>
+		<TLDDir Condition="'!$(TLDSteam)' And Exists('$(TLDEpicDir)')">$(TLDEpicDir)</TLDDir>
+		<TLDEpic>false</TLDEpic>
+		<TLDEpic Condition="'!$(TLDSteam)' And Exists('$(TLDEpicDir)')">true</TLDEpic>
+	</PropertyGroup>
+	<!--Ensure trailing slashes for paths-->
+	<PropertyGroup>
+		<TLDDir>$([MSBuild]::EnsureTrailingSlash('$(TLDDir)'))</TLDDir>
+		<UnityProjectRelativeDir>$([MSBuild]::EnsureTrailingSlash('$(UnityProjectRelativeDir)'))</UnityProjectRelativeDir>
+		<ModComponentRelativeDir>$([MSBuild]::EnsureTrailingSlash('$(ModComponentRelativeDir)'))</ModComponentRelativeDir>
+	</PropertyGroup>
+	<!--Properties depending on TLDDir-->
+	<PropertyGroup Condition="'$(TLDDir)' != ''">
+		<!--Set reference paths for referencing game and mod assemblies-->
+		<ReferencePath>$(TLDDir)MelonLoader\;$(TLDDir)MelonLoader\Managed\;$(TLDDir)Mods\;$(ReferencePath)</ReferencePath>
+		<!--Mods directory-->
+		<TLDModsDir>$(TLDDir)Mods</TLDModsDir>
+	</PropertyGroup>
+	<!--Set Start options to run the game in the default debug configuration-->
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU' And ($(TLDSteam) Or $(TLDEpic))">
+		<StartAction>URL</StartAction>
+		<StartURL Condition="$(TLDSteam)">steam://rungameid/305620</StartURL>
+		<StartURL Condition="$(TLDEpic)">com.epicgames.launcher://apps/58dfcd1952ee48c1a1fa31c6ace5fe3d%253Ae86621f47cab4711826e440296572cad%253Aed93b18355a84230938c705121c63661%3faction=launch&amp;silent=true</StartURL>
+	</PropertyGroup>
+</Project>

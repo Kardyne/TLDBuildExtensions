@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32127.271
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{13B669BE-BB05-4DDF-9536-439F39A36129}") = "Kardyne.TLDBuildExtensions", "Kardyne.TLDBuildExtensions.msbuildproj", "{2F5EB6A0-37E1-404A-ABDD-CBEC1C5051AD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2F5EB6A0-37E1-404A-ABDD-CBEC1C5051AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F5EB6A0-37E1-404A-ABDD-CBEC1C5051AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F5EB6A0-37E1-404A-ABDD-CBEC1C5051AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F5EB6A0-37E1-404A-ABDD-CBEC1C5051AD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8C4014AB-4C19-43CD-8DEB-7A7F15807D52}
+	EndGlobalSection
+EndGlobal

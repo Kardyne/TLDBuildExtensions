@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2022 Kardyne. All rights reserved.
+Licensed under the MIT license. See LICENSE file in the project root for details.
+-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<PropertyGroup>
+		<EGLDataDir>$(registry:HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Epic Games\EpicGamesLauncher@AppDataDir)</EGLDataDir>
+		<EGLDataDir Condition="!Exists('$(EGLDataDir)')">$(ProgramData)\Epic\EpicGamesLauncher\Data\</EGLDataDir>
+		<UnrealLauncherDBPath>$([System.IO.Path]::Combine('$(EGLDataDir)', '..\..\UnrealEngineLauncher\LauncherInstalled.dat'))</UnrealLauncherDBPath>
+		<UnrealLauncherDBPath>$([System.IO.Path]::GetFullPath('$(UnrealLauncherDBPath)'))</UnrealLauncherDBPath>
+		<UnrealLauncherDBText Condition="Exists('$(UnrealLauncherDBPath)')">$([System.IO.File]::ReadAllText('$(UnrealLauncherDBPath)'))</UnrealLauncherDBText>
+		<EpicInstallLocations>
+			$([System.Text.RegularExpressions.Regex]::Replace("$(UnrealLauncherDBText)",
+			'(?&lt;obj&gt;{).*?(?:"InstallLocation":\s*"(?&lt;path&gt;.*?)".*?"AppName":\s*"(?&lt;appname&gt;.*?)"|"AppName":\s*"(?&lt;appname&gt;.*?)".*?"InstallLocation":\s*"(?&lt;path&gt;.*?)").*?(?&lt;-obj&gt;})',
+			"'${appname}':'${path}'", System.Text.RegularExpressions.RegexOptions.Singleline))
+		</EpicInstallLocations>
+		<TLDEpicDir>$([System.Text.RegularExpressions.Regex]::Replace("$(EpicInstallLocations)", ".*'ed93b18355a84230938c705121c63661':'(.*?)'.*", "$1", System.Text.RegularExpressions.RegexOptions.Singleline))</TLDEpicDir>
+	</PropertyGroup>
+</Project>
