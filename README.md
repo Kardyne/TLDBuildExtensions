@@ -8,7 +8,7 @@ provides the following features:
 - Automatic configuration of [reference paths and references](#References) for
   the project.
 - Custom targets for the [build process](#Build):
-  - Build AssetBundle files build
+  - Build AssetBundle files
   - Zip the ModComponent directory
   - Copy mod DLL and ModComponent files to the TLD Mods for faster
     debugging and tests
