@@ -16,6 +16,8 @@ provides the following features:
 
 See [CHANGELOG.md](./CHANGELOG.md) for notable changes between versions.
 
+See also the [NuGet package page](https://www.nuget.org/packages/Kardyne.TLDBuildExtensions).
+
 Check out [TLDModTemplate](https://github.com/Kardyne/TLDModTemplate) for a
 mod template using this package.
 
